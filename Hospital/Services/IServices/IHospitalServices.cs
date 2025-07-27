@@ -2,10 +2,14 @@
 {
     public interface IHospitalServices
     {
-        Task<T> GetAllAsync<T>();
-        Task<T> GetByIdAsync<T>(int id);
-        Task<T> AddAsync<T>(T entity);
-        Task<T> UpdateAsync<T>(T entity);
-        Task<bool> DeleteAsync<T>(int id);
+        Task<T> GetAllDoctorsAsync<T>();
+        Task<T> GetDoctorByIdAsync<T>(int id);
+        Task<T> GetAllClinicsAsync<T>();
+        Task<T> GetClinicByIdAsync<T>(int id);
+        Task<IEnumerable<TEntity>> GetAllAsync<TEntity>() where TEntity : class;
+        Task<TEntity> AddAsync<TEntity>(TEntity entity) where TEntity : class;
+        Task<TEntity> UpdateAsync<TEntity>(TEntity entity) where TEntity : class;
+        Task<TEntity> DeleteAsync<TEntity>(int id) where TEntity : class;
+
     }
 }

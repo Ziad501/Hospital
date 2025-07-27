@@ -1,63 +1,87 @@
 ﻿using Hospital.Models;
+using Hospital.Persistence;
 using Hospital.Services.IServices;
 using Hospital.Utility;
+using Microsoft.EntityFrameworkCore;
 
-namespace Hospital.Services
+namespace Hospital.Services;
+
+public class HospitalService : BaseService, IHospitalServices
 {
-    public class HospitalService : BaseService, IHospitalServices
+    private readonly AppDbContext _context;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private string BaseUrl1;
+    private string BaseUrl2;
+    public HospitalService(IHttpClientFactory httpClientFactory, IConfiguration configuration, AppDbContext context) : base(httpClientFactory)
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private string BaseUrl;
-        public HospitalService(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
-        {
-            _httpClientFactory = httpClientFactory;
-            BaseUrl = configuration.GetValue<string>("ServiceUrls:Doctors");
-        }
-        public Task<T> AddAsync<T>(T entity)
-        {
-            return SendAsync<T>(new APIRequest()
-            {
-                ApiType = SD.ApiType.POST,
-                Data = entity,
-                Url = BaseUrl
-            });
-        }
+        _httpClientFactory = httpClientFactory;
+        _context = context;
+        BaseUrl1 = configuration.GetValue<string>("ServiceUrls:Doctors");
+        BaseUrl2 = configuration.GetValue<string>("ServiceUrls:Clinics");
+    }
 
-        public Task<bool> DeleteAsync<T>(int id)
+    public Task<T> GetAllDoctorsAsync<T>()
+    {
+        return SendAsync<T>(new APIRequest()
         {
-            return SendAsync<bool>(new APIRequest()
-            {
-                ApiType = SD.ApiType.DELETE,
-                Url = $"{BaseUrl}/{id}"
-            });
-        }
+            ApiType = SD.ApiType.GET,
+            Url = BaseUrl1
+        });
+    }
 
-        public Task<T> GetAllAsync<T>()
+    public Task<T> GetDoctorByIdAsync<T>(int id)
+    {
+        return SendAsync<T>(new APIRequest()
         {
-            return SendAsync<T>(new APIRequest()
-            {
-                ApiType = SD.ApiType.GET,
-                Url = BaseUrl
-            });
-        }
+            ApiType = SD.ApiType.GET,
+            Url = $"{BaseUrl1}/{id}"
+        });
+    }
+    public Task<T> GetAllClinicsAsync<T>()
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = SD.ApiType.GET,
+            Url = BaseUrl2
+        });
+    }
 
-        public Task<T> GetByIdAsync<T>(int id)
+    public Task<T> GetClinicByIdAsync<T>(int id)
+    {
+        return SendAsync<T>(new APIRequest()
         {
-            return SendAsync<T>(new APIRequest()
-            {
-                ApiType = SD.ApiType.GET,
-                Url = $"{BaseUrl}/{id}"
-            });
-        }
+            ApiType = SD.ApiType.GET,
+            Url = $"{BaseUrl2}/{id}"
+        });
+    }
 
-        public Task<T> UpdateAsync<T>(T entity)
+    public async Task<IEnumerable<TEntity>> GetAllAsync<TEntity>() where TEntity : class
+    {
+        return await _context.Set<TEntity>().ToListAsync();
+    }
+
+    public async Task<TEntity> AddAsync<TEntity>(TEntity entity) where TEntity : class
+    {
+        await _context.Set<TEntity>().AddAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    }
+
+    public async Task<TEntity> UpdateAsync<TEntity>(TEntity entity) where TEntity : class
+    {
+        _context.Set<TEntity>().Update(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    }
+
+    public async Task<TEntity> DeleteAsync<TEntity>(int id) where TEntity : class
+    {
+        var entity = await _context.Set<TEntity>().FindAsync(id);
+        if (entity != null)
         {
-            return SendAsync<T>(new APIRequest()
-            {
-                ApiType = SD.ApiType.PUT,
-                Data = entity,
-                Url = BaseUrl
-            });
+            _context.Set<TEntity>().Remove(entity);
+            await _context.SaveChangesAsync();
         }
+        return entity;
     }
 }

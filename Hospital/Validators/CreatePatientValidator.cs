@@ -7,33 +7,40 @@ public class CreatePatientValidator : AbstractValidator<CreatePatientDto>
 {
     public CreatePatientValidator()
     {
+        // تم تخصيص رسالة لكل حقل مطلوب
         RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("First name is required")
-            .MaximumLength(50).WithMessage("First name cannot exceed 50 characters");
+            .NotEmpty().WithMessage("الاسم الأول مطلوب")
+            .MaximumLength(50).WithMessage("الاسم الأول لا يمكن أن يتجاوز 50 حرفًا");
 
         RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("Last name is required")
-            .MaximumLength(50).WithMessage("Last name cannot exceed 50 characters");
+            .NotEmpty().WithMessage("الاسم الأخير مطلوب")
+            .MaximumLength(50).WithMessage("الاسم الأخير لا يمكن أن يتجاوز 50 حرفًا");
 
         RuleFor(x => x.Code)
-            .NotEmpty().WithMessage("Patient code is required")
-            .MaximumLength(20).WithMessage("Patient code cannot exceed 20 characters");
+            .NotEmpty().WithMessage("كود المريض مطلوب")
+            .MaximumLength(20).WithMessage("كود المريض لا يمكن أن يتجاوز 20 حرفًا");
 
         RuleFor(x => x.Mobile)
-            .NotEmpty().WithMessage("Mobile number is required")
-            .Matches(@"^01[0-9]{9}$").WithMessage("Invalid Egyptian mobile number format");
+            .NotEmpty().WithMessage("رقم الموبايل مطلوب")
+            .Matches(@"^01[0-9]{9}$").WithMessage("صيغة رقم الموبايل المصري غير صحيحة");
 
         RuleFor(x => x.NationalId)
-            .NotEmpty().WithMessage("National ID is required")
-            .Length(14).WithMessage("National ID must be 14 digits")
-            .Matches(@"^\d{14}$").WithMessage("National ID must contain only digits");
+            .NotEmpty().WithMessage("الرقم القومي مطلوب")
+            .Length(14).WithMessage("الرقم القومي يجب أن يكون 14 رقمًا")
+            .Matches(@"^\d{14}$").WithMessage("الرقم القومي يجب أن يحتوي على أرقام فقط");
 
         RuleFor(x => x.BirthDate)
-            .NotEmpty().WithMessage("Birth date is required")
-            .LessThan(DateTime.Today).WithMessage("Birth date cannot be in the future");
+            .NotEmpty().WithMessage("تاريخ الميلاد مطلوب")
+            .LessThan(DateTime.Today).WithMessage("تاريخ الميلاد لا يمكن أن يكون في المستقبل");
 
         RuleFor(x => x.Gender)
-            .NotEmpty().WithMessage("Gender is required")
-            .Must(x => x == "ذكر" || x == "أنثى").WithMessage("Gender must be either 'ذكر' or 'أنثى'");
+            .NotEmpty().WithMessage("النوع مطلوب")
+            .Must(x => x == "ذكر" || x == "أنثى" || x == "انثى").WithMessage("النوع يجب أن يكون 'ذكر' أو 'أنثى'");
+
+        RuleFor(x => x.Nationality)
+            .NotEmpty().WithMessage("الجنسية مطلوبة");
+
+        RuleFor(x => x.PatientType)
+            .NotEmpty().WithMessage("نوع المريض مطلوب");
     }
 }

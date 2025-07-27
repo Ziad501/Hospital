@@ -1,0 +1,26 @@
+﻿@model List<Hospital.DTOs.ClinicDto>
+@{
+    ViewData["Title"] = "Clinic";
+}
+
+<h1>Clinic</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>AccCode</th>
+            <th>Code</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var clinic in Model)
+        {
+            <tr>
+                <td>@clinic.Name</td>
+                <td>@clinic.AccCode</td>
+                <td>@clinic.Code</td>
+            </tr>
+        }
+    </tbody>
+</table>

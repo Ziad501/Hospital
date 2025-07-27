@@ -39,8 +39,19 @@ namespace Hospital.Services
                 HttpResponseMessage apiResponse = null;
                 apiResponse = await client.SendAsync(message);
                 var apiContent = await apiResponse.Content.ReadAsStringAsync();
-                var APIResponse = JsonConvert.DeserializeObject<T>(apiContent);
-                return APIResponse;
+
+                var ApiResponse = new APIResponse
+                {
+                    IsSuccess = apiResponse.IsSuccessStatusCode,
+                    Result = apiContent, // The raw JSON string goes here
+                    StatusCode = apiResponse.StatusCode
+
+                };
+
+                // Now, we serialize our response and deserialize it into the generic type T
+                var res = JsonConvert.SerializeObject(ApiResponse);
+                var finalResponse = JsonConvert.DeserializeObject<T>(res);
+                return finalResponse;
             }
             catch (Exception ex)
             {

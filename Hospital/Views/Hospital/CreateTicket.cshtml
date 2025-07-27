@@ -1,0 +1,352 @@
+﻿@model Hospital.DTOs.PatientDtos.CreatePatientDto
+@using Hospital.Models
+@{
+    ViewData["Title"] = "CreateTicket";
+}
+
+<style>
+    #createTicketForm{
+        direction: rtl; /* Set the form direction to right-to-left */
+        font-family: 'Cairo', sans-serif; /* Use a suitable Arabic font */
+        font-size: 1.2rem; 
+    }
+    /* Add a pointer cursor to show the religion field is clickable */
+    #religionInput {
+        cursor: pointer;
+    }
+
+    /* Ensure labels are aligned to the right */
+    .form-group label {
+        width: 100%;
+        text-align: right;
+    }
+
+    /* Context Menu Styles */
+    .context-menu {
+        display: none;
+        position: absolute;
+        z-index: 1000;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 150px; /* Set a width for the menu */
+    }
+    .context-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .context-menu ul li a {
+        display: block;
+        padding: 10px 15px;
+        text-decoration: none;
+        color: #333;
+        text-align: right; /* Align text to the right for Arabic */
+    }
+    .context-menu ul li a:hover {
+        background-color: #f5f5f5;
+    }
+</style>
+
+<!-- Context Menu HTML -->
+<div id="contextMenu" class="context-menu">
+    <ul>
+        <li><a href="#" id="addPatientLink">إضافة مريض</a></li>
+        <li><a href="#" id="clearFieldsLink">مسح الحقول</a></li>
+    </ul>
+</div>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+        </div>
+        <div class="col-md-6">
+                <form method="post" asp-action="CreateTicket" id="createTicketForm">
+                    <br />
+                    <div class="container border p-3">
+                        <h1 class="text-primary text-center">إنشاء تذكرة مريض</h1>
+                        <hr />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="FirstName" class="control-label pt-2" style="font-size:20px;">الاسم الاول</label>
+                                <input id="firstNameInput" asp-for="FirstName" class="form-control" placeholder="أدخل الاسم الأول" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="MiddleName" class="control-label pt-2" style="font-size:20px;">الاسم الثاني</label>
+                                <input id="middleNameInput" asp-for="MiddleName" class="form-control" placeholder="أدخل الاسم الثاني" />
+                                <span asp-validation-for="MiddleName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="LastName" class="control-label pt-2" style="font-size:20px;">الاسم الاخير</label>
+                                <input id="lastNameInput" asp-for="LastName" class="form-control" placeholder="أدخل الاسم الأخير" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 form-group mb-1">
+                                <label class="control-label pt-2" style="font-size:20px;">الاسم الثلاثي</label>
+                                <input id="fullNameInput" class="form-control" readonly style="background-color:#e9ecef;" />
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="NationalId" class="control-label pt-2" style="font-size:20px;">الرقم القومي</label>
+                                <input id="nationalIdInput" asp-for="NationalId" class="form-control" placeholder="أدخل الرقم القومي المكون من 14 رقم" maxlength="14" />
+                                <span asp-validation-for="NationalId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="BirthDate" class="control-label pt-2" style="font-size:20px;">تاريخ الميلاد</label>
+                                <input id="birthDateInput" asp-for="BirthDate" class="form-control" readonly type="date" />
+                                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 form-group mb-1">
+                                <label class="control-label pt-2" style="font-size:20px;">العمر</label>
+                                <input id="ageInput" class="form-control" readonly style="background-color:#e9ecef;" />
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="Gender" class="control-label pt-2" style="font-size:20px;">النوع</label>
+                                <input id="genderInput" asp-for="Gender" class="form-control" readonly style="background-color:#e9ecef;" />
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="Mobile" class="control-label pt-2" style="font-size:20px;">رقم الموبايل</label>
+                                <input id="mobileInput" asp-for="Mobile" class="form-control" placeholder="مثال: 01012345678" maxlength="11" />
+                                <span asp-validation-for="Mobile" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="Religion" class="control-label pt-2" style="font-size:20px;">الديانة</label>
+                                <input id="religionInput" asp-for="Religion" class="form-control" readonly />
+                                <span asp-validation-for="Religion" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="Nationality" class="control-label pt-2" style="font-size:20px;">الجنسية</label>
+                                <input id="nationalityInput" asp-for="Nationality" class="form-control" placeholder="أدخل الجنسية" />
+                                <span asp-validation-for="Nationality" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 form-group mb-1">
+                                <label asp-for="PassportAddress" class="control-label pt-2" style="font-size:20px;">عنوان جواز السفر</label>
+                                <input id="passportAddressInput" asp-for="PassportAddress" class="form-control" placeholder="العنوان كما في جواز السفر" />
+                                <span asp-validation-for="PassportAddress" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-end">
+                            <div class="col-md-3 form-group mb-1">
+                                <label asp-for="Code" class="control-label pt-2" style="font-size:20px;">الكود</label>
+                                <input id="codeInput" asp-for="Code" class="form-control" placeholder="أدخل كود المريض" />
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 form-group mb-1">
+                                <label asp-for="PatientType" class="control-label pt-2" style="font-size:20px;">نوع المريض</label>
+                                <select asp-for="PatientType" asp-items="Html.GetEnumSelectList<PatientType>()" class="form-control">
+                                    <option value="">اختر نوع المريض</option>
+                                </select>
+                                <span asp-validation-for="PatientType" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 form-group mb-1">
+                                <label asp-for="ReferredFrom" class="control-label pt-2" style="font-size:20px;">محول من</label>
+                                <input id="referredFromInput" asp-for="ReferredFrom" class="form-control" placeholder="الجهة المحول منها" />
+                                <span asp-validation-for="ReferredFrom" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 form-group mb-1">
+                                <label asp-for="RefDoctorId" class="control-label pt-2" style="font-size:20px;">طبيب محول</label>
+                                <input id="refDoctorIdInput" asp-for="RefDoctorId" class="form-control" placeholder="كود الطبيب المحول" />
+                                <span asp-validation-for="RefDoctorId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 form-group mb-1 text-left">
+                                <button type="submit" class="btn btn-primary btn-lg">إنشاء تذكرة</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+
+            // --- Function to clear all form fields ---
+            function clearFormFields() {
+                $('#createTicketForm').find('input[type=text], input[type=date], select').val('');
+                $('#religionInput').val('مسلم');
+                $('#nationalityInput').val('مصري');
+                $('.text-danger').text(''); // Clear validation messages
+            }
+
+            // --- Initial load logic ---
+            setTimeout(clearFormFields, 10);
+
+            // --- 1. Name Fields Logic ---
+            function updateAllNameFields() {
+                var normalizedFirstName = normalizeArabicChars($('#firstNameInput').val());
+                var normalizedMiddleName = normalizeArabicChars($('#middleNameInput').val());
+                var normalizedLastName = normalizeArabicChars($('#lastNameInput').val());
+
+                $('#firstNameInput').val(normalizedFirstName);
+                $('#middleNameInput').val(normalizedMiddleName);
+                $('#lastNameInput').val(normalizedLastName);
+
+                var fullName = `${normalizedFirstName} ${normalizedMiddleName} ${normalizedLastName}`.trim();
+                $('#fullNameInput').val(fullName);
+            }
+
+            function normalizeArabicChars(text) {
+                return text.replace(/أ/g, 'ا')
+                            .replace(/ة/g, 'ه')
+                            .replace(/ي/g, 'ى');
+            }
+
+            $('#firstNameInput, #middleNameInput, #lastNameInput').on('input', updateAllNameFields);
+
+            // --- 2. National ID Logic ---
+            $('#nationalIdInput').on('input', function () {
+                var nationalId = $(this).val();
+                var genderInput = $('#genderInput');
+                var birthDateInput = $('#birthDateInput');
+                var ageInput = $('#ageInput');
+                var errorSpan = $('span[data-valmsg-for="NationalId"]');
+
+                genderInput.val('');
+                birthDateInput.val('');
+                ageInput.val('');
+                errorSpan.text('');
+
+                if (nationalId.length > 0 && nationalId.length < 14) {
+                    errorSpan.text('الرقم القومي يجب أن يكون 14 رقمًا.');
+                } else if (nationalId.length === 14) {
+                    var firstDigit = nationalId[0];
+                    if (firstDigit !== '2' && firstDigit !== '3') {
+                        errorSpan.text('الرقم القومي يجب أن يبدأ بـ 2 أو 3.');
+                        return;
+                    }
+
+                    var century = (firstDigit === '2') ? '19' : '20';
+                    var year = century + nationalId.substring(1, 3);
+                    var month = nationalId.substring(3, 5);
+                    var day = nationalId.substring(5, 7);
+
+                    var birthDateString = `${year}-${month}-${day}`;
+                    birthDateInput.val(birthDateString);
+
+                    var birthDate = new Date(birthDateString);
+                    if (!isNaN(birthDate.getTime())) {
+                        var today = new Date();
+                        var age = today.getFullYear() - birthDate.getFullYear();
+                        var m = today.getMonth() - birthDate.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                            age--;
+                        }
+                        ageInput.val(age);
+                    }
+
+                    var genderDigit = parseInt(nationalId.charAt(12));
+                    if (!isNaN(genderDigit)) {
+                        genderInput.val(genderDigit % 2 !== 0 ? 'ذكر' : 'انثى');
+                    }
+                }
+            });
+
+            // --- 3. Mobile Number Logic ---
+            var mobileErrorSpan = $('span[data-valmsg-for="Mobile"]');
+            var warningTimeout;
+
+            function showWarning(message) {
+                mobileErrorSpan.text(message);
+                clearTimeout(warningTimeout);
+                warningTimeout = setTimeout(function() {
+                    mobileErrorSpan.text('');
+                }, 1500);
+            }
+
+            $('#mobileInput').on('keydown', function (e) {
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    return;
+                }
+                var currentValue = $(this).val();
+                var key = e.key;
+                if (isNaN(parseInt(key))) {
+                    showWarning('الرجاء إدخال أرقام فقط.');
+                    e.preventDefault();
+                    return;
+                }
+                if (currentValue.length === 0 && key !== '0') {
+                    showWarning('يجب أن يبدأ الرقم بـ 0.');
+                    e.preventDefault();
+                } else if (currentValue.length === 1 && key !== '1') {
+                    showWarning('الرقم الثاني يجب أن يكون 1.');
+                    e.preventDefault();
+                } else if (currentValue.length === 2 && !['0', '1', '2', '5'].includes(key)) {
+                    showWarning('الرقم الثالث يجب أن يكون 0, 1, 2, أو 5.');
+                    e.preventDefault();
+                } else if (currentValue.length >= 11) {
+                    e.preventDefault();
+                }
+            });
+
+            // --- 4. Religion Field Logic ---
+            var religionInput = $('#religionInput');
+            if (religionInput.val() === '') {
+                 religionInput.val('مسلم');
+            }
+            religionInput.on('click', function() {
+                if ($(this).val() === 'مسلم') {
+                    $(this).val('مسيحي');
+                } else {
+                    $(this).val('مسلم');
+                }
+            });
+
+            // --- 5. Context Menu Logic ---
+            var contextMenu = $('#contextMenu');
+
+            // Show context menu on right-click
+            $(document).on('contextmenu', function(e) {
+                e.preventDefault();
+                contextMenu.css({
+                    top: e.pageY + 'px',
+                    left: e.pageX + 'px'
+                }).show();
+            });
+
+            // Hide context menu on left-click
+            $(document).on('click', function() {
+                contextMenu.hide();
+            });
+
+            // Handle "Add Patient" click
+            $('#addPatientLink').on('click', function(e) {
+                e.preventDefault();
+                $('#createTicketForm').submit(); // Submit the form
+                contextMenu.hide();
+            });
+
+            // Handle "Clear Fields" click
+            $('#clearFieldsLink').on('click', function(e) {
+                e.preventDefault();
+                clearFormFields();
+                contextMenu.hide();
+            });
+        });
+    </script>
+}
