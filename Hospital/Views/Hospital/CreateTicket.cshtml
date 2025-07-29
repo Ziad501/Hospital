@@ -1,27 +1,27 @@
-﻿@model Hospital.DTOs.PatientDtos.CreatePatientDto
+﻿@model Hospital.ViewModels.CreateTicketViewModel
 @using Hospital.Models
 @{
     ViewData["Title"] = "CreateTicket";
 }
 
 <style>
-    #createTicketForm{
-        direction: rtl; /* Set the form direction to right-to-left */
-        font-family: 'Cairo', sans-serif; /* Use a suitable Arabic font */
-        font-size: 1.2rem; 
+    #mainForm {
+        direction: rtl;
+        font-family: 'Cairo', sans-serif;
+        font-size: 1.1rem;
     }
-    /* Add a pointer cursor to show the religion field is clickable */
+
     #religionInput {
         cursor: pointer;
     }
 
-    /* Ensure labels are aligned to the right */
     .form-group label {
         width: 100%;
         text-align: right;
+        font-weight: 500;
+        color: #555;
     }
 
-    /* Context Menu Styles */
     .context-menu {
         display: none;
         position: absolute;
@@ -30,323 +30,451 @@
         border: 1px solid #ccc;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         list-style: none;
-        padding: 0;
+        padding: 5px 0;
         margin: 0;
-        width: 150px; /* Set a width for the menu */
+        width: 150px;
+        border-radius: 5px;
     }
-    .context-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-    .context-menu ul li a {
-        display: block;
-        padding: 10px 15px;
-        text-decoration: none;
-        color: #333;
-        text-align: right; /* Align text to the right for Arabic */
-    }
-    .context-menu ul li a:hover {
-        background-color: #f5f5f5;
+
+        .context-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+            .context-menu ul li a {
+                display: block;
+                padding: 8px 15px;
+                text-decoration: none;
+                color: #333;
+                text-align: right;
+            }
+
+                .context-menu ul li a:hover {
+                    background-color: #f5f5f5;
+                }
+
+    .btn-danger.btn-sm {
+        padding: 0.1rem 0.5rem;
+        font-size: 0.9rem;
     }
 </style>
 
-<!-- Context Menu HTML -->
 <div id="contextMenu" class="context-menu">
     <ul>
-        <li><a href="#" id="addPatientLink">إضافة مريض</a></li>
+        <li><a href="#" id="saveAllLink">حفظ الكل</a></li>
         <li><a href="#" id="clearFieldsLink">مسح الحقول</a></li>
     </ul>
 </div>
 
+<form asp-action="CreateTicket" method="post" id="mainForm">
+    @Html.AntiForgeryToken()
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-6">
-        </div>
-        <div class="col-md-6">
-                <form method="post" asp-action="CreateTicket" id="createTicketForm">
-                    <br />
-                    <div class="container border p-3">
-                        <h1 class="text-primary text-center">إنشاء تذكرة مريض</h1>
-                        <hr />
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                        <div class="row">
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="FirstName" class="control-label pt-2" style="font-size:20px;">الاسم الاول</label>
-                                <input id="firstNameInput" asp-for="FirstName" class="form-control" placeholder="أدخل الاسم الأول" />
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="MiddleName" class="control-label pt-2" style="font-size:20px;">الاسم الثاني</label>
-                                <input id="middleNameInput" asp-for="MiddleName" class="form-control" placeholder="أدخل الاسم الثاني" />
-                                <span asp-validation-for="MiddleName" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="LastName" class="control-label pt-2" style="font-size:20px;">الاسم الاخير</label>
-                                <input id="lastNameInput" asp-for="LastName" class="form-control" placeholder="أدخل الاسم الأخير" />
-                                <span asp-validation-for="LastName" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 form-group mb-1">
-                                <label class="control-label pt-2" style="font-size:20px;">الاسم الثلاثي</label>
-                                <input id="fullNameInput" class="form-control" readonly style="background-color:#e9ecef;" />
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="NationalId" class="control-label pt-2" style="font-size:20px;">الرقم القومي</label>
-                                <input id="nationalIdInput" asp-for="NationalId" class="form-control" placeholder="أدخل الرقم القومي المكون من 14 رقم" maxlength="14" />
-                                <span asp-validation-for="NationalId" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="BirthDate" class="control-label pt-2" style="font-size:20px;">تاريخ الميلاد</label>
-                                <input id="birthDateInput" asp-for="BirthDate" class="form-control" readonly type="date" />
-                                <span asp-validation-for="BirthDate" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 form-group mb-1">
-                                <label class="control-label pt-2" style="font-size:20px;">العمر</label>
-                                <input id="ageInput" class="form-control" readonly style="background-color:#e9ecef;" />
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="Gender" class="control-label pt-2" style="font-size:20px;">النوع</label>
-                                <input id="genderInput" asp-for="Gender" class="form-control" readonly style="background-color:#e9ecef;" />
-                                <span asp-validation-for="Gender" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="Mobile" class="control-label pt-2" style="font-size:20px;">رقم الموبايل</label>
-                                <input id="mobileInput" asp-for="Mobile" class="form-control" placeholder="مثال: 01012345678" maxlength="11" />
-                                <span asp-validation-for="Mobile" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="Religion" class="control-label pt-2" style="font-size:20px;">الديانة</label>
-                                <input id="religionInput" asp-for="Religion" class="form-control" readonly />
-                                <span asp-validation-for="Religion" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="Nationality" class="control-label pt-2" style="font-size:20px;">الجنسية</label>
-                                <input id="nationalityInput" asp-for="Nationality" class="form-control" placeholder="أدخل الجنسية" />
-                                <span asp-validation-for="Nationality" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4 form-group mb-1">
-                                <label asp-for="PassportAddress" class="control-label pt-2" style="font-size:20px;">عنوان جواز السفر</label>
-                                <input id="passportAddressInput" asp-for="PassportAddress" class="form-control" placeholder="العنوان كما في جواز السفر" />
-                                <span asp-validation-for="PassportAddress" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row align-items-end">
-                            <div class="col-md-3 form-group mb-1">
-                                <label asp-for="Code" class="control-label pt-2" style="font-size:20px;">الكود</label>
-                                <input id="codeInput" asp-for="Code" class="form-control" placeholder="أدخل كود المريض" />
-                                <span asp-validation-for="Code" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-3 form-group mb-1">
-                                <label asp-for="PatientType" class="control-label pt-2" style="font-size:20px;">نوع المريض</label>
-                                <select asp-for="PatientType" asp-items="Html.GetEnumSelectList<PatientType>()" class="form-control">
-                                    <option value="">اختر نوع المريض</option>
-                                </select>
-                                <span asp-validation-for="PatientType" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-3 form-group mb-1">
-                                <label asp-for="ReferredFrom" class="control-label pt-2" style="font-size:20px;">محول من</label>
-                                <input id="referredFromInput" asp-for="ReferredFrom" class="form-control" placeholder="الجهة المحول منها" />
-                                <span asp-validation-for="ReferredFrom" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-3 form-group mb-1">
-                                <label asp-for="RefDoctorId" class="control-label pt-2" style="font-size:20px;">طبيب محول</label>
-                                <input id="refDoctorIdInput" asp-for="RefDoctorId" class="form-control" placeholder="كود الطبيب المحول" />
-                                <span asp-validation-for="RefDoctorId" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12 form-group mb-1 text-left">
-                                <button type="submit" class="btn btn-primary btn-lg">إنشاء تذكرة</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="direction: rtl;">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">تأكيد العملية المالية</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0;"></button>
+                </div>
+                <div class="modal-body" style="text-align: right;">
+                    <div class="form-group mb-3"><label for="modalBaseAmount" class="form-label">المبلغ الأساسي</label><input type="text" id="modalBaseAmount" class="form-control" readonly style="background-color:#e9ecef;"></div>
+                    <div class="form-group mb-3"><label for="modalDiscount" class="form-label">الخصم</label><input type="number" step="0.01" id="modalDiscount" class="form-control"></div>
+                    <div class="form-group mb-3"><label for="modalTaxes" class="form-label">الضرائب</label><input type="number" step="0.01" id="modalTaxes" class="form-control" placeholder="أدخل قيمة الضرائب" value="0"></div>
+                    <hr />
+                    <div class="form-group mb-3"><label for="modalFinalAmount" class="form-label">المبلغ النهائي</label><input type="text" id="modalFinalAmount" class="form-control" readonly style="background-color:#e9ecef; font-weight: bold; color: green;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-primary" id="confirmSaveButton">تأكيد وحفظ</button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <br />
+                <div class="container border p-3 shadow-sm bg-body-tertiary rounded pb-4">
+                    <h1 class="text-primary text-center">تسجيل مريض</h1>
+                    <hr />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.FirstName" class="form-label pt-1">الاسم الاول</label><input type="text" id="firstNameInput" asp-for="CreatePatient.FirstName" class="form-control" required /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.MiddleName" class="form-label pt-1">الاسم الثاني</label><input id="middleNameInput" asp-for="CreatePatient.MiddleName" class="form-control" /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.LastName" class="form-label pt-1">الاسم الاخير</label><input id="lastNameInput" asp-for="CreatePatient.LastName" class="form-control" required /></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 form-group"><label class="form-label pt-1">الاسم الثلاثي</label><input id="fullNameInput" class="form-control" readonly style="background-color:#e9ecef;" /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.NationalId" class="form-label pt-1">الرقم القومي</label><input id="nationalIdInput" asp-for="CreatePatient.NationalId" class="form-control" maxlength="14" required /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.BirthDate" class="form-label pt-1">تاريخ الميلاد</label><input id="birthDateInput" asp-for="CreatePatient.BirthDate" class="form-control" readonly type="date" /></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 form-group"><label class="form-label pt-1">العمر</label><input id="ageInput" class="form-control" readonly style="background-color:#e9ecef;" /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.Gender" class="form-label pt-1">النوع</label><input id="genderInput" asp-for="CreatePatient.Gender" class="form-control" readonly style="background-color:#e9ecef;" /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.Mobile" class="form-label pt-1">رقم الموبايل</label><input id="mobileInput" asp-for="CreatePatient.Mobile" class="form-control" maxlength="11" required /></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.Religion" class="form-label pt-1">الديانة</label><input id="religionInput" asp-for="CreatePatient.Religion" class="form-control" readonly /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.Nationality" class="form-label pt-1">الجنسية</label><input id="nationalityInput" asp-for="CreatePatient.Nationality" class="form-control" required /></div>
+                        <div class="col-md-4 form-group"><label asp-for="CreatePatient.PassportAddress" class="form-label pt-1">عنوان جواز السفر</label><input asp-for="CreatePatient.PassportAddress" class="form-control" /></div>
+                    </div>
+                    <div class="row align-items-end">
+                        <div class="col-md-3 form-group"><label asp-for="CreatePatient.Code" class="form-label pt-1">الكود</label><input asp-for="CreatePatient.Code" class="form-control" required /></div>
+                        <div class="col-md-3 form-group"><label asp-for="CreatePatient.PatientType" class="form-label pt-1">نوع المريض</label><select asp-for="CreatePatient.PatientType" asp-items="Html.GetEnumSelectList<PatientType>()" class="form-select" required><option value="">اختر..</option></select></div>
+                        <div class="col-md-3 form-group"><label asp-for="CreatePatient.ReferredFrom" class="form-label pt-1">محول من</label><input asp-for="CreatePatient.ReferredFrom" class="form-control" /></div>
+                        <div class="col-md-3 form-group"><label asp-for="CreatePatient.RefDoctorId" class="form-label pt-1">طبيب محول</label><input asp-for="CreatePatient.RefDoctorId" class="form-control" /></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <br />
+                <div class="container border p-3 shadow-sm bg-body-tertiary rounded">
+                    <h1 class="text-success text-center">إنشاء فحص جديد</h1>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-4 form-group mb-1"><label asp-for="CreateExamination.ClinicCode" class="form-label pt-1">العيادة</label><select id="CreateExamination_ClinicCode" asp-for="CreateExamination.ClinicCode" asp-items="Model.ClinicOptions" class="form-select" required><option value="">-- اختر العيادة --</option></select></div>
+                        <div class="col-md-4 form-group mb-1"><label asp-for="CreateExamination.DoctorCode" class="form-label pt-1">الطبيب</label><select id="CreateExamination_DoctorCode" asp-for="CreateExamination.DoctorCode" class="form-select" required disabled><option value="">-- اختر طبيب --</option></select></div>
+                        <div class="col-md-4 form-group mb-1"><label asp-for="CreateExamination.HospitalName" class="form-label pt-1">اسم المستشفى</label><input asp-for="CreateExamination.HospitalName" class="form-control" required /></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 form-group mb-1"><label asp-for="CreateExamination.PatientType" class="form-label pt-1">نوع المريض</label><select asp-for="CreateExamination.PatientType" class="form-select" disabled>@foreach (var item in Html.GetEnumSelectList<PatientType>()){
+                        <option value="@item.Value">@item.Text</option>
+                                                }
+                        </select></div>
+                        <div class="col-md-4 form-group mb-1"><label asp-for="CreateExamination.ContractType" class="form-label pt-1">نوع التعاقد</label><select asp-for="CreateExamination.ContractType" asp-items="Html.GetEnumSelectList<ContractType>()" class="form-select" required><option value="">-- اختر نوع التعاقد --</option></select></div>
+                        <div class="col-md-4 form-group mb-1"><label asp-for="CreateExamination.Statement" class="form-label pt-1">البيان</label><input asp-for="CreateExamination.Statement" class="form-control" /></div>
+                    </div>
+                    <hr /><h5 class="text-primary mt-3">الخدمات المطلوبة</h5>
+                    <div class="row mb-2 align-items-end">
+                        <div class="col-md-8"><label for="serviceSearch" class="form-label">اختر خدمة</label><select id="serviceSearch" class="form-select"></select></div>
+                        <div class="col-md-4"><button type="button" id="addServiceBtn" class="btn btn-success w-100">إضافة خدمة</button></div>
+                    </div>
+                    <table class="table table-striped table-bordered table-sm">
+                        <thead class="table-light"><tr><th style="width: 40%;">الخدمة</th><th style="width: 15%;">السعر</th><th style="width: 15%;">الكمية</th><th style="width: 20%;">الإجمالي</th><th style="width: 10%;"></th></tr></thead>
+                        <tbody id="servicesTableBody"></tbody>
+                    </table>
+                    <div id="servicesForSubmission"></div>
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-1"><label asp-for="CreateExamination.Amount" class="form-label pt-1">المبلغ الإجمالي</label><input asp-for="CreateExamination.Amount" type="number" class="form-control" readonly style="background-color:#e9ecef;" /></div>
+                        <div class="col-md-6 form-group mb-1"><label asp-for="CreateExamination.Discount" class="form-label pt-1">الخصم</label><input asp-for="CreateExamination.Discount" type="number" step="0.01" class="form-control" required value="0" /></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary btn-lg shadow p-3 mb-5 bg-body-tertiary rounded" style="width: 250px; font-size: 1.5rem;">حفظ الكل</button>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="~/js/amiri.font.js"></script>
+
     <script>
         $(document).ready(function () {
+            const patientTypeSource = $('#CreatePatient_PatientType');
+            const patientTypeTarget = $('#CreateExamination_PatientType');
 
-            // --- Function to clear all form fields ---
+            patientTypeSource.on('change', function () {
+                patientTypeTarget.val($(this).val());
+            });
+
             function clearFormFields() {
-                $('#createTicketForm').find('input[type=text], input[type=date], select').val('');
+                $('#mainForm').trigger("reset");
                 $('#religionInput').val('مسلم');
                 $('#nationalityInput').val('مصري');
-                $('.text-danger').text(''); // Clear validation messages
+                $('.text-danger').html('');
+                patientTypeTarget.val(patientTypeSource.val());
+                $('#CreateExamination_DoctorCode').html('<option value="">-- اختر طبيب --</option>').prop('disabled', true);
+                $('#servicesTableBody').empty();
+                updateTotals();
             }
-
-            // --- Initial load logic ---
             setTimeout(clearFormFields, 10);
 
-            // --- 1. Name Fields Logic ---
             function updateAllNameFields() {
-                var normalizedFirstName = normalizeArabicChars($('#firstNameInput').val());
-                var normalizedMiddleName = normalizeArabicChars($('#middleNameInput').val());
-                var normalizedLastName = normalizeArabicChars($('#lastNameInput').val());
-
-                $('#firstNameInput').val(normalizedFirstName);
-                $('#middleNameInput').val(normalizedMiddleName);
-                $('#lastNameInput').val(normalizedLastName);
-
-                var fullName = `${normalizedFirstName} ${normalizedMiddleName} ${normalizedLastName}`.trim();
-                $('#fullNameInput').val(fullName);
+                const normalize = text => text.replace(/أ/g, 'ا').replace(/ة/g, 'ه').replace(/ي/g, 'ى');
+                var fName = normalize($('#firstNameInput').val());
+                var mName = normalize($('#middleNameInput').val());
+                var lName = normalize($('#lastNameInput').val());
+                $('#firstNameInput').val(fName);
+                $('#middleNameInput').val(mName);
+                $('#lastNameInput').val(lName);
+                $('#fullNameInput').val(`${fName} ${mName} ${lName}`.replace(/\s+/g, ' ').trim());
             }
-
-            function normalizeArabicChars(text) {
-                return text.replace(/أ/g, 'ا')
-                            .replace(/ة/g, 'ه')
-                            .replace(/ي/g, 'ى');
-            }
-
             $('#firstNameInput, #middleNameInput, #lastNameInput').on('input', updateAllNameFields);
 
-            // --- 2. National ID Logic ---
             $('#nationalIdInput').on('input', function () {
-                var nationalId = $(this).val();
-                var genderInput = $('#genderInput');
-                var birthDateInput = $('#birthDateInput');
-                var ageInput = $('#ageInput');
-                var errorSpan = $('span[data-valmsg-for="NationalId"]');
-
-                genderInput.val('');
-                birthDateInput.val('');
-                ageInput.val('');
-                errorSpan.text('');
-
-                if (nationalId.length > 0 && nationalId.length < 14) {
-                    errorSpan.text('الرقم القومي يجب أن يكون 14 رقمًا.');
-                } else if (nationalId.length === 14) {
-                    var firstDigit = nationalId[0];
-                    if (firstDigit !== '2' && firstDigit !== '3') {
-                        errorSpan.text('الرقم القومي يجب أن يبدأ بـ 2 أو 3.');
-                        return;
-                    }
-
-                    var century = (firstDigit === '2') ? '19' : '20';
-                    var year = century + nationalId.substring(1, 3);
-                    var month = nationalId.substring(3, 5);
-                    var day = nationalId.substring(5, 7);
-
-                    var birthDateString = `${year}-${month}-${day}`;
-                    birthDateInput.val(birthDateString);
-
-                    var birthDate = new Date(birthDateString);
+                const nationalId = $(this).val();
+                if (nationalId.length === 14) {
+                    const firstDigit = nationalId[0];
+                    if (firstDigit !== '2' && firstDigit !== '3') return;
+                    const century = (firstDigit === '2') ? '19' : '20';
+                    const year = century + nationalId.substring(1, 3);
+                    const month = nationalId.substring(3, 5);
+                    const day = nationalId.substring(5, 7);
+                    $('#birthDateInput').val(`${year}-${month}-${day}`);
+                    const birthDate = new Date(`${year}-${month}-${day}`);
                     if (!isNaN(birthDate.getTime())) {
-                        var today = new Date();
-                        var age = today.getFullYear() - birthDate.getFullYear();
-                        var m = today.getMonth() - birthDate.getMonth();
-                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                            age--;
-                        }
-                        ageInput.val(age);
+                        let age = new Date().getFullYear() - birthDate.getFullYear();
+                        const m = new Date().getMonth() - birthDate.getMonth();
+                        if (m < 0 || (m === 0 && new Date().getDate() < birthDate.getDate())) age--;
+                        $('#ageInput').val(age);
                     }
-
-                    var genderDigit = parseInt(nationalId.charAt(12));
-                    if (!isNaN(genderDigit)) {
-                        genderInput.val(genderDigit % 2 !== 0 ? 'ذكر' : 'انثى');
-                    }
-                }
-            });
-
-            // --- 3. Mobile Number Logic ---
-            var mobileErrorSpan = $('span[data-valmsg-for="Mobile"]');
-            var warningTimeout;
-
-            function showWarning(message) {
-                mobileErrorSpan.text(message);
-                clearTimeout(warningTimeout);
-                warningTimeout = setTimeout(function() {
-                    mobileErrorSpan.text('');
-                }, 1500);
-            }
-
-            $('#mobileInput').on('keydown', function (e) {
-                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
-                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
-                    (e.keyCode >= 35 && e.keyCode <= 40)) {
-                    return;
-                }
-                var currentValue = $(this).val();
-                var key = e.key;
-                if (isNaN(parseInt(key))) {
-                    showWarning('الرجاء إدخال أرقام فقط.');
-                    e.preventDefault();
-                    return;
-                }
-                if (currentValue.length === 0 && key !== '0') {
-                    showWarning('يجب أن يبدأ الرقم بـ 0.');
-                    e.preventDefault();
-                } else if (currentValue.length === 1 && key !== '1') {
-                    showWarning('الرقم الثاني يجب أن يكون 1.');
-                    e.preventDefault();
-                } else if (currentValue.length === 2 && !['0', '1', '2', '5'].includes(key)) {
-                    showWarning('الرقم الثالث يجب أن يكون 0, 1, 2, أو 5.');
-                    e.preventDefault();
-                } else if (currentValue.length >= 11) {
-                    e.preventDefault();
-                }
-            });
-
-            // --- 4. Religion Field Logic ---
-            var religionInput = $('#religionInput');
-            if (religionInput.val() === '') {
-                 religionInput.val('مسلم');
-            }
-            religionInput.on('click', function() {
-                if ($(this).val() === 'مسلم') {
-                    $(this).val('مسيحي');
+                    const genderDigit = parseInt(nationalId.charAt(12));
+                    if (!isNaN(genderDigit)) $('#genderInput').val(genderDigit % 2 !== 0 ? 'ذكر' : 'انثى');
                 } else {
-                    $(this).val('مسلم');
+                     $('#birthDateInput, #ageInput, #genderInput').val('');
                 }
             });
 
-            // --- 5. Context Menu Logic ---
             var contextMenu = $('#contextMenu');
-
-            // Show context menu on right-click
-            $(document).on('contextmenu', function(e) {
+            $(document).on('contextmenu', function (e) {
                 e.preventDefault();
-                contextMenu.css({
-                    top: e.pageY + 'px',
-                    left: e.pageX + 'px'
-                }).show();
+                contextMenu.css({ top: e.pageY + 'px', left: e.pageX + 'px' }).show();
+            });
+            $(document).on('click', function () { contextMenu.hide(); });
+            $('#saveAllLink').on('click', function (e) { e.preventDefault(); $('#mainForm').submit(); contextMenu.hide(); });
+            $('#clearFieldsLink').on('click', function (e) { e.preventDefault(); clearFormFields(); contextMenu.hide(); });
+
+            $('#CreateExamination_ClinicCode').on('change', function () {
+                const clinicCode = $(this).val();
+                const doctorDropdown = $('#CreateExamination_DoctorCode');
+                doctorDropdown.prop('disabled', true).html('<option value="">... تحميل ...</option>');
+
+                if (clinicCode) {
+                    $.getJSON('/Hospital/GetDoctorsByClinic', { clinicCode: clinicCode }, function (doctors) {
+                        doctorDropdown.empty().append('<option value="">-- اختر طبيب --</option>');
+                        $.each(doctors, function (i, doctor) {
+                            doctorDropdown.append($('<option>', { value: doctor.code, text: doctor.name }));
+                        });
+                        doctorDropdown.prop('disabled', false);
+                    });
+                } else {
+                    doctorDropdown.html('<option value="">-- اختر طبيب --</option>');
+                }
             });
 
-            // Hide context menu on left-click
-            $(document).on('click', function() {
-                contextMenu.hide();
+            const serviceSearch = $('#serviceSearch');
+            let servicesData = [];
+
+            $.getJSON('/Hospital/GetServices', function(data) {
+                servicesData = data;
+                serviceSearch.empty().append('<option value="">-- ابحث واختر خدمة --</option>');
+                $.each(servicesData, function(i, service) {
+                    serviceSearch.append($('<option>', { value: service.code, text: `${service.name} (${service.price.toFixed(2)})` }));
+                });
             });
 
-            // Handle "Add Patient" click
-            $('#addPatientLink').on('click', function(e) {
+            $('#addServiceBtn').on('click', function() {
+                const serviceCode = serviceSearch.val();
+                if (!serviceCode) return;
+                if ($(`#servicesTableBody tr[data-service-code="${serviceCode}"]`).length > 0) {
+                    alert('هذه الخدمة مضافة بالفعل.');
+                    return;
+                }
+                const service = servicesData.find(s => s.code === serviceCode);
+                const newRow = `<tr data-service-code="${service.code}" data-service-price="${service.price}" data-service-name="${service.name}">
+                                    <td>${service.name}</td>
+                                    <td>${service.price.toFixed(2)}</td>
+                                    <td><input type="number" class="form-control form-control-sm quantity-input" value="1" min="1"></td>
+                                    <td class="row-total">${service.price.toFixed(2)}</td>
+                                    <td><button type="button" class="btn btn-danger btn-sm remove-service-btn">X</button></td>
+                                </tr>`;
+                $('#servicesTableBody').append(newRow);
+                updateTotals();
+            });
+
+            $('#servicesTableBody').on('click', '.remove-service-btn', function() { $(this).closest('tr').remove(); updateTotals(); });
+            $('#servicesTableBody').on('input', '.quantity-input', function() { updateTotals(); });
+
+            function updateTotals() {
+                let totalAmount = 0;
+                $('#servicesTableBody tr').each(function() {
+                    const row = $(this);
+                    const price = parseFloat(row.data('service-price'));
+                    const quantity = parseInt(row.find('.quantity-input').val()) || 0;
+                    const rowTotal = price * quantity;
+                    row.find('.row-total').text(rowTotal.toFixed(2));
+                    totalAmount += rowTotal;
+                });
+                $('#CreateExamination_Amount').val(totalAmount.toFixed(2));
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+            var mainForm = $('#mainForm');
+
+            mainForm.on('submit', function (e) {
                 e.preventDefault();
-                $('#createTicketForm').submit(); // Submit the form
-                contextMenu.hide();
+                if (mainForm.valid()) {
+                    const totalAmount = parseFloat($('#CreateExamination_Amount').val()) || 0;
+                    const discount = parseFloat($('#CreateExamination_Discount').val()) || 0;
+                    $('#modalBaseAmount').val(totalAmount.toFixed(2));
+                    $('#modalDiscount').val(discount.toFixed(2));
+                    calculateFinalAmountInModal();
+                    modal.show();
+                }
             });
 
-            // Handle "Clear Fields" click
-            $('#clearFieldsLink').on('click', function(e) {
-                e.preventDefault();
-                clearFormFields();
-                contextMenu.hide();
+            $('#modalDiscount, #modalTaxes').on('input', calculateFinalAmountInModal);
+
+            function calculateFinalAmountInModal() {
+                const baseAmount = parseFloat($('#modalBaseAmount').val()) || 0;
+                const discount = parseFloat($('#modalDiscount').val()) || 0;
+                const taxes = parseFloat($('#modalTaxes').val()) || 0;
+                const finalAmount = (baseAmount - discount) + taxes;
+                $('#modalFinalAmount').val(finalAmount.toFixed(2));
+            }
+
+            $('#confirmSaveButton').on('click', function () {
+                $(this).prop('disabled', true).text('جاري الحفظ...');
+
+                const submissionDiv = $('#servicesForSubmission').empty();
+                $('#servicesTableBody tr').each(function(index) {
+                    const row = $(this);
+                    submissionDiv.append(`<input type="hidden" name="CreateExamination.Services[${index}].ServiceCode" value="${row.data('service-code')}" />`);
+                    submissionDiv.append(`<input type="hidden" name="CreateExamination.Services[${index}].ServiceName" value="${row.data('service-name')}" />`);
+                    submissionDiv.append(`<input type="hidden" name="CreateExamination.Services[${index}].Price" value="${row.data('service-price')}" />`);
+                    submissionDiv.append(`<input type="hidden" name="CreateExamination.Services[${index}].Quantity" value="${row.find('.quantity-input').val()}" />`);
+                });
+
+                $('#CreateExamination_Discount').val($('#modalDiscount').val());
+                patientTypeTarget.prop('disabled', false);
+
+                const formData = new FormData(mainForm[0]);
+
+                fetch(mainForm.attr('action'), {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        modal.hide();
+                        generateAndShowPdf(data.receipt);
+                        clearFormFields();
+                    } else {
+                        let errorHtml = '<ul>';
+                        data.errors.forEach(err => errorHtml += `<li>${err}</li>`);
+                        errorHtml += '</ul>';
+                        $('.text-danger[asp-validation-summary="All"]').html(errorHtml);
+                        modal.hide();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An unexpected network error occurred.');
+                })
+                .finally(() => {
+                    $('#confirmSaveButton').prop('disabled', false).text('تأكيد وحفظ');
+                    patientTypeTarget.prop('disabled', true);
+                });
             });
+
+        async function generateAndShowPdf(receipt) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.addFileToVFS('Amiri-Regular.ttf', amiriFontAsBase64);
+            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+            doc.setFont('Amiri');
+
+            const qrCodeContainer = document.createElement('div');
+            new QRCode(qrCodeContainer, {
+                text: `Patient Code: ${receipt.examination.patientId}\nReceipt: ${receipt.receiptNumber}`,
+                width: 128,
+                height: 128,
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+            const qrCodeImage = qrCodeContainer.querySelector('img').src;
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 15;
+
+            doc.addImage(qrCodeImage, 'PNG', margin, margin, 30, 30);
+
+            doc.setFontSize(20);
+            
+            doc.text('فاتورة كشف', pageWidth / 2, margin + 10, { align: 'center' });
+
+            doc.setFontSize(12);
+            doc.text(receipt.examination.hospitalName, pageWidth / 2, margin + 18, { align: 'center' });
+
+            const receiptLabel = ":رقم الفاتورة";
+            const dateLabel = ":تاريخ الإصدار";
+
+            const d = new Date(receipt.issueDate);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            const dateValue = `${day}/${month}/${year}`;
+            const receiptValue = receipt.receiptNumber;
+
+            let receiptLabelWidth = doc.getTextWidth(receiptLabel);
+            let dateLabelWidth = doc.getTextWidth(dateLabel);
+
+            doc.text(receiptLabel, pageWidth - margin, margin + 10, { align: 'right' });
+            doc.text(receiptValue, pageWidth - margin - receiptLabelWidth - 2, margin + 10,     { align:'right' }); // Changed to 'right'
+
+        doc.text(dateLabel, pageWidth - margin, margin + 18, { align: 'right' });
+        doc.text(dateValue, pageWidth - margin - dateLabelWidth - 2, margin + 18, { align: 'right' });
+
+            let y = margin + 45;
+            doc.setFontSize(14);
+            doc.text('بيانات المريض', pageWidth - margin, y, { align: 'right' });
+            doc.setLineWidth(0.5);
+            doc.line(pageWidth - margin, y + 2, margin, y + 2);
+            y += 10;
+            doc.setFontSize(10);
+            doc.text(`الاسم: ${receipt.examination.patientName}`, pageWidth - margin, y, { align: 'right' });
+            y += 7;
+            doc.text(`العيادة: ${receipt.examination.clinicName}`, pageWidth - margin, y, { align: 'right' });
+            y += 7;
+            doc.text(`الطبيب: ${receipt.examination.doctorName}`, pageWidth - margin, y, { align: 'right' });
+
+            const tableHead = [['الإجمالي', 'الكمية', 'السعر', 'الخدمة']];
+            const tableBody = receipt.examination.services.map(s => [
+                (s.price * s.quantity).toFixed(2),
+                s.quantity,
+                s.price.toFixed(2),
+                s.serviceName
+            ]);
+
+            doc.autoTable({
+                startY: y + 10,
+                head: tableHead,
+                body: tableBody,
+                theme: 'grid',
+                headStyles: { font: 'Amiri', halign: 'center', fillColor: [41, 128, 185] },
+                styles: { font: 'Amiri', halign: 'right' },
+                columnStyles: {
+                    0: { halign: 'center' },
+                    1: { halign: 'center' },
+                    2: { halign: 'center' },
+                }
+            });
+
+            let finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(12);
+            doc.text(`المبلغ الإجمالي: ${receipt.examination.amount.toFixed(2)}`, pageWidth - margin, finalY, { align: 'right' });
+            finalY += 7;
+            doc.text(`الخصم: ${receipt.examination.discount.toFixed(2)}`, pageWidth - margin, finalY, { align: 'right' });
+            finalY += 7;
+            doc.setFontSize(14);
+            // doc.setFont('Amiri', 'bold'); // Set font to bold
+            doc.text(`المبلغ الصافي: ${receipt.totalAmount.toFixed(2)}`, pageWidth - margin, finalY, { align: 'right' });
+            // doc.setFont('Amiri', 'normal'); // Set it back to normal
+            doc.output('dataurlnewwindow');
+        }
         });
     </script>
 }

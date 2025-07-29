@@ -5,6 +5,7 @@ namespace Hospital.DTOs.ExaminationDtos;
 public class CreateExaminationDto
 {
     public PatientType PatientType { get; set; }
+    public ContractType ContractType { get; set; }
     public string HospitalName { get; set; }
     public string ClinicCode { get; set; }
     public string DoctorCode { get; set; }

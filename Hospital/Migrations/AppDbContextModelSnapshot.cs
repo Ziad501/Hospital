@@ -22,56 +22,6 @@ namespace Hospital.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Hospital.Models.Clinic", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AccCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("Clinics");
-                });
-
-            modelBuilder.Entity("Hospital.Models.Doctor", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DocAccCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("EadaAccCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("MName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("Doctors");
-                });
-
             modelBuilder.Entity("Hospital.Models.Examination", b =>
                 {
                     b.Property<int>("Id")
@@ -85,7 +35,9 @@ namespace Hospital.Migrations
                         .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("ClinicCode")
-                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClinicName")
                         .HasColumnType("text");
 
                     b.Property<int>("ContractType")
@@ -96,14 +48,15 @@ namespace Hospital.Migrations
                         .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("DoctorCode")
-                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DoctorName")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ExaminationDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("HospitalName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -117,23 +70,20 @@ namespace Hospital.Migrations
                     b.Property<int>("PatientId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PatientName")
+                        .HasColumnType("text");
+
                     b.Property<int>("PatientType")
                         .HasColumnType("integer");
 
                     b.Property<string>("PriceBookCode")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Statement")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClinicCode");
-
-                    b.HasIndex("DoctorCode");
 
                     b.HasIndex("PatientId");
 
@@ -309,27 +259,11 @@ namespace Hospital.Migrations
 
             modelBuilder.Entity("Hospital.Models.Examination", b =>
                 {
-                    b.HasOne("Hospital.Models.Clinic", "Clinic")
-                        .WithMany("Examinations")
-                        .HasForeignKey("ClinicCode")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Hospital.Models.Doctor", "Doctor")
-                        .WithMany("Examinations")
-                        .HasForeignKey("DoctorCode")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Hospital.Models.Patient", "Patient")
                         .WithMany("Examinations")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Clinic");
-
-                    b.Navigation("Doctor");
 
                     b.Navigation("Patient");
                 });
@@ -354,16 +288,6 @@ namespace Hospital.Migrations
                         .IsRequired();
 
                     b.Navigation("Examination");
-                });
-
-            modelBuilder.Entity("Hospital.Models.Clinic", b =>
-                {
-                    b.Navigation("Examinations");
-                });
-
-            modelBuilder.Entity("Hospital.Models.Doctor", b =>
-                {
-                    b.Navigation("Examinations");
                 });
 
             modelBuilder.Entity("Hospital.Models.Examination", b =>

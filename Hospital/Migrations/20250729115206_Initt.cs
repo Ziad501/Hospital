@@ -7,39 +7,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hospital.Migrations
 {
     /// <inheritdoc />
-    public partial class initDb : Migration
+    public partial class Initt : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Clinics",
-                columns: table => new
-                {
-                    Code = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    AccCode = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Clinics", x => x.Code);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Doctors",
-                columns: table => new
-                {
-                    Code = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    EadaAccCode = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    MName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    DocAccCode = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Doctors", x => x.Code);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Patients",
                 columns: table => new
@@ -74,34 +46,25 @@ namespace Hospital.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PatientType = table.Column<int>(type: "integer", nullable: false),
-                    HospitalName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    ClinicCode = table.Column<string>(type: "text", nullable: false),
-                    PriceBookCode = table.Column<string>(type: "text", nullable: false),
+                    HospitalName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    ClinicCode = table.Column<string>(type: "text", nullable: true),
+                    PriceBookCode = table.Column<string>(type: "text", nullable: true),
                     ContractType = table.Column<int>(type: "integer", nullable: false),
-                    DoctorCode = table.Column<string>(type: "text", nullable: false),
-                    Statement = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    DoctorCode = table.Column<string>(type: "text", nullable: true),
+                    Statement = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     ExaminationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     PatientId = table.Column<int>(type: "integer", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     Discount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     NetAmount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
-                    IsPaid = table.Column<bool>(type: "boolean", nullable: false)
+                    IsPaid = table.Column<bool>(type: "boolean", nullable: false),
+                    ClinicName = table.Column<string>(type: "text", nullable: true),
+                    DoctorName = table.Column<string>(type: "text", nullable: true),
+                    PatientName = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Examinations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Examinations_Clinics_ClinicCode",
-                        column: x => x.ClinicCode,
-                        principalTable: "Clinics",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Examinations_Doctors_DoctorCode",
-                        column: x => x.DoctorCode,
-                        principalTable: "Doctors",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Examinations_Patients_PatientId",
                         column: x => x.PatientId,
@@ -159,16 +122,6 @@ namespace Hospital.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Examinations_ClinicCode",
-                table: "Examinations",
-                column: "ClinicCode");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Examinations_DoctorCode",
-                table: "Examinations",
-                column: "DoctorCode");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Examinations_PatientId",
                 table: "Examinations",
                 column: "PatientId");
@@ -213,12 +166,6 @@ namespace Hospital.Migrations
 
             migrationBuilder.DropTable(
                 name: "Examinations");
-
-            migrationBuilder.DropTable(
-                name: "Clinics");
-
-            migrationBuilder.DropTable(
-                name: "Doctors");
 
             migrationBuilder.DropTable(
                 name: "Patients");

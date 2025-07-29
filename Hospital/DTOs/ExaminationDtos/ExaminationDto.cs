@@ -6,11 +6,11 @@ public class ExaminationDto
 {
     public int Id { get; set; }
     public PatientType PatientType { get; set; }
-    public string HospitalName { get; set; }
-    public string ClinicCode { get; set; }
-    public string ClinicName { get; set; }
-    public string DoctorCode { get; set; }
-    public string DoctorName { get; set; }
+    public string? HospitalName { get; set; }
+    public string? ClinicCode { get; set; }
+    public string? ClinicName { get; set; }
+    public string? DoctorCode { get; set; }
+    public string? DoctorName { get; set; }
     public string Statement { get; set; }
     public DateTime ExaminationDate { get; set; }
     public int PatientId { get; set; }

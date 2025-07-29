@@ -60,6 +60,13 @@ public class HospitalService : BaseService, IHospitalServices
         return await _context.Set<TEntity>().ToListAsync();
     }
 
+    public async Task<Examination> AddExaminationAsync(Examination examination)
+    {
+        // Your logic to add the examination to the database and save changes
+        await _context.Set<Examination>().AddAsync(examination);
+        await _context.SaveChangesAsync();
+        return examination;
+    }
     public async Task<TEntity> AddAsync<TEntity>(TEntity entity) where TEntity : class
     {
         await _context.Set<TEntity>().AddAsync(entity);
@@ -83,5 +90,17 @@ public class HospitalService : BaseService, IHospitalServices
             await _context.SaveChangesAsync();
         }
         return entity;
+    }
+    public async Task<bool> PatientCodeExistsAsync(string code)
+    {
+        return await _context.Patients.AnyAsync(p => p.Code == code);
+    }
+    public async Task<Receipt> AddReceiptAsync(Receipt receipt)
+    {
+        await _context.Receipts.AddAsync(receipt);
+
+        await _context.SaveChangesAsync();
+
+        return receipt;
     }
 }
